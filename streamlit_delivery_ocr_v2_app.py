@@ -11,8 +11,8 @@ from pdf2image import convert_from_path
 from openpyxl import load_workbook
 
 
-st.set_page_config(page_title="PDF OCR Tracker Updater", layout="wide")
-st.title("PDF OCR Tracker Updater")
+st.set_page_config(page_title="PDF Fienhage Tracker", layout="wide")
+st.title("PDF Fienhage Tracker")
 
 
 # -----------------------------
@@ -207,14 +207,6 @@ def stitch_pages_vertically(pages):
     return stitched
 
 
-def crop_table_region(img):
-    width, height = img.size
-    top_crop = int(height * 0.05)
-    bottom_crop = int(height * 1.00)
-    cropped = img.crop((0, top_crop, width, bottom_crop))
-    return ImageOps.autocontrast(cropped)
-
-
 def process_delivery_files(delivery_files):
     all_items = []
     preview_images = []
@@ -230,11 +222,15 @@ def process_delivery_files(delivery_files):
 
         pages = load_pages_from_upload(uploaded_file)
         stitched_img = stitch_pages_vertically(pages)
-        cropped_img = crop_table_region(stitched_img)
 
-        preview_images.append((uploaded_file.name, cropped_img))
+        processed_img = ImageOps.autocontrast(stitched_img)
 
-        text = pytesseract.image_to_string(cropped_img, config="--psm 6")
+        preview_images.append((uploaded_file.name, processed_img))
+
+        text = pytesseract.image_to_string(
+            processed_img,
+            config="--psm 6 -c preserve_interword_spaces=1"
+        )
         document_number = extract_document_number(text)
 
         lines = text.split("\n")
