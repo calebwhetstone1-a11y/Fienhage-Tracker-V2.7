@@ -177,7 +177,7 @@ def preprocess_for_ocr(img):
     img = img.convert("L")
     img = ImageOps.autocontrast(img)
     img = img.filter(ImageFilter.SHARPEN)
-    img = img.point(lambda p: 255 if p > 170 else 0)
+    img = img.point(lambda p: 255 if p > 150 else 0)
     return img
 
 
